@@ -274,9 +274,12 @@ options(digits=2)
 
 ## Effective confidence interval `r low` to `r hi`
 
+# Conclusion and Recommendations
 
+The Covid-19 vaccine was not effective in participants who are men or gay.The covid-19 effectiveness for guys was `r effectivenessguy` . The covid-19 effectiveness for gay participants was `r effectivenessgay` . The odds for gay people who took the vaccine were at most at 3:1, that's three times more likely to get covid with the vaccine than with placebo. 
 
+The Covid-19 vaccine effectively protected women and drug users, their odds were 1:2 with the vaccine. That's half as likely to get covid than those taking placebo. The effectiveness for gals was `r effectivenessgal` and for drug users it was `r effectivenessDrugUser` .
 
-
+The vaccine is not recommended for people who are gay. It is recommended for individuals who are female or drug users since it was the most effective in those two groups.
 
 

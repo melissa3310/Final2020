@@ -1,22 +1,100 @@
+
 ---
-title: "Covid91 vaccine study Final2021"
-author: "Put your name here!"
-date: "put the date here"
+title: "Covid19 vaccine study Final2021"
+author: " your name "
+date: "Summer 2021"
 output: 
-    html_document:
-    toc: true
+   html_document:
+         toc: true
+         toc_depth: 5
+    
 ---
 
 ```{r include=FALSE,echo=FALSE}
 require(tidyverse)
 require(tigerstats)
 require(forcats)
-OldData <-read.csv(file="covid91.csv",header=TRUE)
+oldData <-read.csv(file="covid91.csv",header=TRUE)
 #recode to remove the annoying "X" from the dataframe
-FinalData <- OldData %>% mutate(infected = recode(infected, aids = "covid", none = "OK" )) %>% select(-one_of("X"))
+FinalData <- oldData %>% mutate(infected = recode(infected, aids = "covid", none = "OK" )) %>% select(-one_of("X"))
+FinalData <- FinalData %>%
+mutate(across(where(is.character), as.factor))
+#FinalData$treatment <- relevel(FinalData$treatment,ref="placebo")
+FinalData$treatment <- relevel(FinalData$treatment,ref="placebo")
+guy = filter(FinalData, sex =="guy")
+gal = filter(FinalData, sex =="gal")
+gay = filter(FinalData, LGBTQ =="gay")
+DrugUser = filter(FinalData, DrugUser == "yes")
 ```
 
 # Introduction
 
 A new  preventative vaccine (covid91) is under test in clinical trials. Given the nature of this vaccine it is suspected that the drug may exhibit different effectiveness across the variety of subpopulations tracked. Consider population subgroups by gender( guys and gals), drug use, and sexual orientation. Write a complete report that separately considers this drug for each subgroup and your recommendations as to whether people in the subgroup should take the vaccine. Structure your report in four sections each devoted to one of the four subgroups, use null and alternative hypothesis statements and correct statistical verbage when referencing p-values in conclusions.
+
+
+# Guys
+
+### Barplot
+
+```{r}
+dd2 <- guy %>% group_by(infected,treatment) %>% summarize(count=n()) %>%
+mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+# now for percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+
+```
+
+The barchart is showing that 337 people were infected with covid19 and almost 58% were infected when they got the drug. About 42% who were infected received the placebo. It seems that the guys who got the vaccine are one and a half time more likey to get covid, the vaccine appears to be ineffective.
+
+In the first plot on the left, the numbers going up the left side represent the y-axis or the number of people who got covid. The bottom represents the x-axis or whether people got covid or not. As opposed to the second plot which shows the percentage on the y-xis instead. One shows the number of each group who got covid and who didn't with both the vaccine and the placebo and the other shows the same placebo.
+
+
+### Numerical Results
+
+```{r}
+table1 <- xtabs(~infected + treatment, data=guy)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results show that among the guys 58% got covid after taking then vaccine, while about 42% of the guys who took placebo got covid. This shows the vaccine is not effective in preventing covid in males and is not recommended. The guys who took the placebo were less likely to get covid. The guys who gto the vaccine odds of getting covid are 3:2, thats one and a half times more likely than those who took the placebo. 
+
+### Inferential Results
+
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+guysfish <- fisher.test(table1)
+guysfish
+```
+
+Based on the inferential results we can reject the null hypothesis in favor of the alternative, since the p-value is 0.0005801, which is a very tiny number. The null predicted that the deaths related to covid are independent of sex but clearly sex is a factor in the death rates for covid for guys. 
+
+```{r}
+effect <- guysfish$p.value/(guysfish$p.value +1)
+effectivenessguy = guysfish$estimate/(guysfish$estimate +1)*100
+print(effectivenessguy)
+```
+
+```{r}
+low=(guysfish$conf.int[1]/(guysfish$conf.int[1] +1))*100
+hi=(guysfish$conf.int[2]/(guysfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effective confidence interval `r low` to `r hi`
+
+
+
+
+
 

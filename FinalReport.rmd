@@ -154,6 +154,65 @@ options(digits=2)
 
 ## Effective confidence interval `r low` to `r hi`
 
+# Gay Sexual Orientation
+
+### Barplot
+
+```{r}
+dd2 <- gay %>% group_by(infected,treatment) %>% summarize(count=n()) %>%
+mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+# now for percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+
+```
+
+In this boxplot it appears that about 71% of gay people who got the vaccine still got covid and 29% of them who took the placebo got covid. The odds of getting covid with the vaccine is 2.5:1. People who identified as gay and took the vaccine were three times aas likely to get covis as those who took the placebo.
+
+In the first plot on the left, the numbers going up the left side represent the y-axis or the number of people who got covid. The bottom represents the x-axis or whether people got covid or not. As opposed to the second plot which shows the percentage on the y-xis instead. One shows the number of each group who got covid and who didn't with both the vaccine and the placebo and the other shows the same information but in percentage.
+
+### Numerical Results
+
+```{r}
+table1 <- xtabs(~infected + treatment, data=gay)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The 71% of the gay participants who took the vaccine got covid, only 29% of those who took the placebo got covid. Based on this information it seems that the vaccine is not effective for the gay community and is not advised. The odds of gettign covid with the vaccine are 2.5:1, meaning gay participants were three times more likely to get covid than those who took the placebo.
+
+### Inferential Results
+
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+gayfish <- fisher.test(table1)
+gayfish
+```
+
+The p-value in these inferential results is 6e-06, which is a very small number as well meaning these results are unlikely to occur by chance. The odds of gay people getting covid with the vaccine is 2.5 moree likely than those who took placebo. Therefore we can reject the null hypothesis in favor of the alternative.
+
+```{r}
+effect <- gayfish$p.value/(gayfish$p.value +1)
+effectivenessgay = gayfish$estimate/(gayfish$estimate +1)*100
+print(effectivenessgay)
+```
+
+```{r}
+low=(gayfish$conf.int[1]/(gayfish$conf.int[1] +1))*100
+hi=(gayfish$conf.int[2]/(gayfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effective confidence interval `r low` to `r hi`
 
 
 

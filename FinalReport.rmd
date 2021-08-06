@@ -94,6 +94,70 @@ options(digits=2)
 ## Effective confidence interval `r low` to `r hi`
 
 
+# Gals
+
+### Barplot
+
+```{r}
+dd2 <- gal %>% group_by(infected,treatment) %>% summarize(count=n()) %>%
+mutate(prcnt=count/sum(count))
+
+
+# the group_by followed by summarize(count=n())
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+# now for percentage plot
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment))
+basicCC + geom_bar(stat="identity", position = "dodge")
+
+```
+
+Based on this barplot it seems that less gals who got the vaccine than those who took the placebo, which is the opposite of the guys. About 33% of the gals that got the vaccine got covid, meaning the other 67% percent who got covid took placebo. The odds of getting covid for the gals with the vaccine is 1:2, half as likely to get covid than those who took the placebo.
+
+In the first plot on the left, the numbers going up the left side represent the y-axis or the number of people who got covid. The bottom represents the x-axis or whether people got covid or not. As opposed to the second plot which shows the percentage on the y-xis instead. One shows the number of each group who got covid and who didn't with both the vaccine and the placebo and the other shows the same information but in percentage.
+
+### Numerical Results
+
+```{r}
+table1 <- xtabs(~infected + treatment, data=gal)
+rowPerc(table1)
+colPerc(table1)
+```
+
+The numerical results show that the percentage of gals who took the vaccine and got covid is 33% as we estimated in the barplot. 67% of the gals who took placebo got covid, this shows that the vaccine is effecive in protecting gals against covid. The odds for gals getting covid with the vaccine is 1:2, they are half as likely to get covid than those taking the placebo.
+
+### Inferential Results
+
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+galsfish <- fisher.test(table1)
+galsfish
+```
+
+Based on the results in the fishers test the p-value is <2e-16 which is very small and this means the results aren't likely to occur by chance so the null hypothesis can be rejected in favor of the alternative.
+
+```{r}
+effect <- galsfish$p.value/(galsfish$p.value +1)
+effectivenessgal = galsfish$estimate/(galsfish$estimate +1)*100
+print(effectivenessgal)
+```
+
+```{r}
+low=(galsfish$conf.int[1]/(galsfish$conf.int[1] +1))*100
+hi=(galsfish$conf.int[2]/(galsfish$conf.int[2] +1))*100
+options(digits=2)
+```
+
+## Effective confidence interval `r low` to `r hi`
+
+
+
+
+
 
 
 
